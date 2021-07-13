@@ -17,7 +17,9 @@ proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
 data.dir <- paste(proj.dir, "data/", sep="")
 fig.dir <- paste (proj.dir, "figs/", sep="")
 
-
-
 # load branchial arch data
 branchial.data <- read.csv((paste(data.dir, "branchial_data.csv", sep="")))
+
+# Identify factors 
+facs <- c("Species", "Arch.ID", "Arch.Type")
+branchial.data[,facs] <- lapply(branchial.data[,facs], factor)
