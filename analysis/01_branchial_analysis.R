@@ -15,7 +15,7 @@
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-library(broom)
+library(lme4)
 
 # define file names
 proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
@@ -39,3 +39,7 @@ ab.data <- branchial.data %>%
   droplevels() %>%
   {.}
 
+# model testing
+
+hmodel <- lmer(data=ab.data, Arch.Length ~ SL + (SL | Species) + (SL | Arch.Type) + (SL | Arch.Type:Arch.ID))
+               
