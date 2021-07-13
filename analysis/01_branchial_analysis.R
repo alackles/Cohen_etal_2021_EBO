@@ -16,6 +16,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(lme4)
+library(lmerTest)
 
 # define file names
 proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
@@ -39,7 +40,15 @@ ab.data <- branchial.data %>%
   droplevels() %>%
   {.}
 
-# model testing
 
-hmodel <- lmer(data=ab.data, Arch.Length ~ SL + (SL | Species) + (SL | Arch.Type) + (SL | Arch.Type:Arch.ID))
-               
+##############################################
+# 2. BUILD THE MODEL
+#############################################
+
+h.model <- lmer(data=ab.data, Arch.Length ~ SL*Species*Arch.Type + (0 + SL | Arch.Type:Arch.ID))
+summ.model <- summary(h.model)
+coef.model <- coef(summ.model)
+
+###########################################
+# 3. PRETTY PICTURES
+##########################################
