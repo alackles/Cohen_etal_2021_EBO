@@ -13,12 +13,11 @@ library(tidyr)
 library(broom)
 
 # define file names
-proj.dir <- "~/Documents/researc/paper-ebo/" #path to this repo
+proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
 data.dir <- paste(proj.dir, "data/", sep="")
 fig.dir <- paste (proj.dir, "figs/", sep="")
 
 
 
 # load branchial arch data
-cb.data <- read.csv((paste(data.dir, "cb_data.csv", sep="")))
-eb.data <- read.csv((paste(data.dir, "eb_data.csv", sep="")))
+branchial.data <- read.csv((paste(data.dir, "branchial_data.csv", sep="")))
