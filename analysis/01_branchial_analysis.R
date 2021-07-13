@@ -57,8 +57,8 @@ ratio.model <- lmer(data=ab.data, Arch.Ratio ~ SL*Species*Arch.Type + (SL | Arch
 
 
 # this is an option if you want CIs, but you probably don't
-#model.predict <- predictInterval(ratio.model)
-#ab.data <-bind_cols(ab.data, model.predict)
+#model.predict.length <- predictInterval(length.model)
+#ab.data <-bind_cols(ab.data, model.predict.length)
 
 ab.data$fitratio <- predict(ratio.model)
 ab.data$fitlength <- predict(length.model)
@@ -85,7 +85,7 @@ plot.cb.ratio <- ggplot(subset(ab.data, Arch.Type=="cerato"), aes(x=SL, y=Arch.R
   labs(x="",y="") +
   NULL
 
-ggsave("cb_ratio_no_ci.pdf", plot=plot.cb.ratio, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
+ggsave("cb_ratio.pdf", plot=plot.cb.ratio, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
 
 
 plot.eb.ratio <- ggplot(subset(ab.data, Arch.Type=="epi"), aes(x=SL, y=Arch.Ratio, color=Arch.ID, fill=Arch.ID)) +
@@ -93,7 +93,7 @@ plot.eb.ratio <- ggplot(subset(ab.data, Arch.Type=="epi"), aes(x=SL, y=Arch.Rati
   geom_point(size=4, aes(alpha=Oss.Status, fill=Arch.ID), pch=21) +
   geom_point(pch=1, size=4, aes(color=Arch.ID)) + 
   geom_line(aes(y=fitratio), size=1.5) +
-  # geom_ribbon(aes(y=fit, ymin=lwr, ymax=upr), alpha=0.2, color=NA) +
+  #geom_ribbon(aes(y=fit, ymin=lwr, ymax=upr), alpha=0.2, color=NA) +
   scale_fill_viridis(discrete=TRUE) +
   scale_colour_viridis(discrete=TRUE) + 
   scale_alpha_discrete(labels=c("Cartilage", "Partial", "Ossified"), name="Ossification") +
@@ -103,7 +103,7 @@ plot.eb.ratio <- ggplot(subset(ab.data, Arch.Type=="epi"), aes(x=SL, y=Arch.Rati
   labs(x="",y="") +
   NULL
 
-ggsave("eb_ratio_ci.pdf", plot=plot.eb.ratio, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
+ggsave("eb_ratio.pdf", plot=plot.eb.ratio, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
 
 #############
 # These plots are for ARCH LENGTH
@@ -123,7 +123,7 @@ plot.cb.length <- ggplot(subset(ab.data, Arch.Type=="cerato"), aes(x=SL, y=Arch.
   labs(x="",y="") +
   NULL
 
-ggsave("cb_length_no_ci.pdf", plot=plot.cb.length, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
+ggsave("cb_length_ci.pdf", plot=plot.cb.length, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
 
 
 plot.eb.length <- ggplot(subset(ab.data, Arch.Type=="epi"), aes(x=SL, y=Arch.Length, color=Arch.ID, fill=Arch.ID)) +
@@ -141,4 +141,4 @@ plot.eb.length <- ggplot(subset(ab.data, Arch.Type=="epi"), aes(x=SL, y=Arch.Len
   labs(x="",y="") +
   NULL
 
-ggsave("eb_length_no_ci.pdf", plot=plot.eb.length, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
+ggsave("eb_length.pdf", plot=plot.eb.length, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
