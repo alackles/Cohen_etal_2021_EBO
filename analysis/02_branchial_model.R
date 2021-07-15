@@ -13,24 +13,24 @@ library(lme4)
 library(lmerTest)
 library(dplyr)
 library(tidyr)
+library(AICcmodavg)
 
 # files
 proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
 data.dir <- paste(proj.dir, "data/", sep="")
 df.fname <- paste(data.dir, "branchial_df.Rdata", sep="")
 model.fname <- paste(data.dir, "model_df.Rdata", sep="")
-slopes.fname <- paste(data.dir, "model_slopes.csv")
+slopes.fname <- paste(data.dir, "model_slopes.csv", sep="")
 
 # load the required data
 ab.data <- readRDS(df.fname)
 
 # Build Models
-length.model <- lmer(data=ab.data, Arch.Length ~ SL*Species*Arch.Type + (0 + SL | Arch.Type:Arch.ID))
-ratio.model <- lmer(data=ab.data, Arch.Ratio ~ SL*Species*Arch.Type + (SL | Arch.Type:Arch.ID))
+model <- lmer(data=ab.data, Arch.Length ~ SL*Species*Arch.Type + (0 + SL | Arch.Type:Arch.ID))
 
 # add model fit to data
-ab.data$fitratio <- predict(ratio.model)
-ab.data$fitlength <- predict(length.model)
+ab.data$fit <- predict(model)
+ab.data$fitratio <- ab.data$fit/ab.data$SL
 
 # model slopes (i am so sorry)
 ab.slopes <- ab.data %>% 

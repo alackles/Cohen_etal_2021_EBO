@@ -6,11 +6,6 @@
 #
 # @brief: Creates visualizations based on models and data from analysis
 
-
-###############################################
-# 0. DEFINITIONS
-###############################################
-
 # required packages
 library(ggplot2)
 library(viridis)
@@ -26,82 +21,61 @@ fig.dir <- paste (proj.dir, "figs/", sep="")
 # load the required data
 model.data <- readRDS(model.fname)
 
-##########################################
-# 1. PRETTY PICTURES
-##########################################
+plot_ebo <- function(model.df, y="length", legend="off") {
+  
+  plt <- ggplot(model.df)
+  
+  # Determine y-axis
+  if (y == "length") {
+    plt <- plt + aes(x=SL, y=Arch.Length) + geom_line(aes(y=fit), size=1.2)
+  } else if (y == "ratio") {
+    plt <- plt + aes(x=SL, y=Arch.Ratio) + geom_line(aes(y=fitratio), size=1.2)
+  } else {
+    print("ERROR: Invalid y. Check spelling?")
+    return(-1)
+  }
+  
+  # Basic plot features
+  plt <- plt + aes(color=Arch.ID, fill=Arch.ID) + 
+    facet_wrap(~Arch.Type*Species, scales="free") +
+    geom_point(size=4, aes(alpha=Oss.Status, fill=Arch.ID), pch=21) +
+    geom_point(pch=1, size=4, aes(color=Arch.ID)) + 
+    scale_fill_viridis(discrete=TRUE) +
+    scale_colour_viridis(discrete=TRUE) + 
+    theme_minimal(base_size = 12)
+  
+  # show or hide legend?
+  if (legend=="off") {
+    plt <- plt + theme(legend.position="none", strip.text.x = element_blank()) +
+      labs(x="",y="")
+  } else {
+    plt <- plt + guides(alpha=guide_legend(override.aes=list(shape=16)))
+  }
+  
+  return(plt)
+  
+}
 
-#############
-# These plots are for ARCH RATIO
+ggsave("length_blank.pdf", 
+       plot= plot_ebo(model.data),
+       device="pdf", 
+       path = fig.dir, 
+       width=12, height=9, dpi=300)
 
-plot.cb.ratio <- ggplot(subset(ab.data, Arch.Type=="cerato"), aes(x=SL, y=Arch.Ratio, color=Arch.ID, fill=Arch.ID)) +
-  facet_wrap(~Species, scales="free") +
-  geom_point(size=4, aes(alpha=Oss.Status, fill=Arch.ID), pch=21) +
-  geom_point(pch=1, size=4, aes(color=Arch.ID)) + 
-  geom_line(aes(y=fitratio), size=1.5) +
-  #geom_ribbon(aes(y=fit, ymin=lwr, ymax=upr), alpha=0.2, color=NA) +
-  scale_fill_viridis(discrete=TRUE) +
-  scale_colour_viridis(discrete=TRUE) + 
-  scale_alpha_discrete(labels=c("Cartilage", "Partial", "Ossified"), name="Ossification") +
-  guides(alpha=guide_legend(override.aes=list(shape=16))) +
-  theme_minimal(base_size = 12) +
-  theme(legend.position="none", strip.text.x = element_blank()) +
-  labs(x="",y="") +
-  NULL
+ggsave("length_legend.pdf", 
+       plot= plot_ebo(model.data, legend="on"),
+       device="pdf", 
+       path = fig.dir, 
+       width=12, height=9, dpi=300)
 
-ggsave("cb_ratio.pdf", plot=plot.cb.ratio, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
+ggsave("ratio_blank.pdf",
+       plot= plot_ebo(model.data, y="ratio"),
+       device="pdf", 
+       path = fig.dir, 
+       width=12, height=9, dpi=300)
 
-
-plot.eb.ratio <- ggplot(subset(ab.data, Arch.Type=="epi"), aes(x=SL, y=Arch.Ratio, color=Arch.ID, fill=Arch.ID)) +
-  facet_wrap(~Species, scales="free") +
-  geom_point(size=4, aes(alpha=Oss.Status, fill=Arch.ID), pch=21) +
-  geom_point(pch=1, size=4, aes(color=Arch.ID)) + 
-  geom_line(aes(y=fitratio), size=1.5) +
-  #geom_ribbon(aes(y=fit, ymin=lwr, ymax=upr), alpha=0.2, color=NA) +
-  scale_fill_viridis(discrete=TRUE) +
-  scale_colour_viridis(discrete=TRUE) + 
-  scale_alpha_discrete(labels=c("Cartilage", "Partial", "Ossified"), name="Ossification") +
-  guides(alpha=guide_legend(override.aes=list(shape=16))) +
-  theme_minimal(base_size = 12) +
-  theme(legend.position="none", strip.text.x = element_blank()) +
-  labs(x="",y="") +
-  NULL
-
-ggsave("eb_ratio.pdf", plot=plot.eb.ratio, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
-
-#############
-# These plots are for ARCH LENGTH
-
-plot.cb.length <- ggplot(subset(ab.data, Arch.Type=="cerato"), aes(x=SL, y=Arch.Length, color=Arch.ID, fill=Arch.ID)) +
-  facet_wrap(~Species, scales="free") +
-  geom_point(size=4, aes(alpha=Oss.Status, fill=Arch.ID), pch=21) +
-  geom_point(pch=1, size=4, aes(color=Arch.ID)) + 
-  geom_line(aes(y=fitlength), size=1.5) +
-  #geom_ribbon(aes(y=fit, ymin=lwr, ymax=upr), alpha=0.2, color=NA) +
-  scale_fill_viridis(discrete=TRUE) +
-  scale_colour_viridis(discrete=TRUE) + 
-  scale_alpha_discrete(labels=c("Cartilage", "Partial", "Ossified"), name="Ossification") +
-  guides(alpha=guide_legend(override.aes=list(shape=16))) +
-  theme_minimal(base_size = 12) +
-  theme(legend.position="none", strip.text.x = element_blank()) +
-  labs(x="",y="") +
-  NULL
-
-ggsave("cb_length_ci.pdf", plot=plot.cb.length, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
-
-
-plot.eb.length <- ggplot(subset(ab.data, Arch.Type=="epi"), aes(x=SL, y=Arch.Length, color=Arch.ID, fill=Arch.ID)) +
-  facet_wrap(~Species, scales="free") +
-  geom_point(size=4, aes(alpha=Oss.Status, fill=Arch.ID), pch=21) +
-  geom_point(pch=1, size=4, aes(color=Arch.ID)) + 
-  geom_line(aes(y=fitlength), size=1.5) +
-  #geom_ribbon(aes(y=fit, ymin=lwr, ymax=upr), alpha=0.2, color=NA) +
-  scale_fill_viridis(discrete=TRUE) +
-  scale_colour_viridis(discrete=TRUE) + 
-  scale_alpha_discrete(labels=c("Cartilage", "Partial", "Ossified"), name="Ossification") +
-  guides(alpha=guide_legend(override.aes=list(shape=16))) +
-  theme_minimal(base_size = 12) +
-  theme(legend.position="none", strip.text.x = element_blank()) +
-  labs(x="",y="") +
-  NULL
-
-ggsave("eb_length.pdf", plot=plot.eb.length, device="pdf", path = fig.dir, width=10, height=5, dpi=300)
+ggsave("ratio_legend.pdf",
+       plot= plot_ebo(model.data, y="ratio", legend="on"),
+       device="pdf", 
+       path = fig.dir, 
+       width=12, height=9, dpi=300)
