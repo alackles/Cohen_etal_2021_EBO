@@ -19,12 +19,12 @@ library(viridis)
 # files
 proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
 data.dir <- paste(proj.dir, "data/", sep="")
-df.fname <- paste(data.dir, "branchial_df.Rdata", sep="")
+model.fname <- paste(data.dir, "model_df.Rdata", sep="")
 fig.dir <- paste (proj.dir, "figs/", sep="")
 
 
 # load the required data
-ab.data <- readRDS(df.fname)
+model.data <- readRDS(model.fname)
 
 ##########################################
 # 1. PRETTY PICTURES
