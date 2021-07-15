@@ -19,6 +19,8 @@ library(tidyr)
 library(lme4)
 library(lmerTest)
 library(merTools)
+library(effects)
+library(ggeffects)
 
 # define file names
 proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
@@ -62,6 +64,23 @@ ratio.model <- lmer(data=ab.data, Arch.Ratio ~ SL*Species*Arch.Type + (SL | Arch
 
 ab.data$fitratio <- predict(ratio.model)
 ab.data$fitlength <- predict(length.model)
+
+# View the model data
+cb.effects.brev <- ggpredict(length.model, terms=c("Arch.ID", "Arch.Type [cerato]"), condition=c(Species="brevoortia"), type="random")
+cb.effects.anch <- ggpredict(length.model, terms=c("Arch.ID", "Arch.Type [cerato]"), condition=c(Species="anchoa"), type="random")
+eb.effects.brev <- ggpredict(length.model, terms=c("Arch.ID", "Arch.Type [epi]"), condition=c(Species="brevoortia"), type="random")
+eb.effects.anch <- ggpredict(length.model, terms=c("Arch.ID", "Arch.Type [epi]"), condition=c(Species="anchoa"), type="random")
+
+##########################################
+# 3. SAVE DF & MODEL TO EXPORT
+##########################################
+
+return_list <- list("ab_df.Rdata"=ab.data, "legnth_model.Rdata"=length.model, "ratio_model.Rdata"=ratio.model)
+for (i in 1:length(return_list)) {
+  temp_obj <- return_list[[i]]
+  save(temp_obj, file=paste(data.dir, names(return_list)[i], sep=""))
+}
+
 ###########################################
 # 3. PRETTY PICTURES
 ##########################################
