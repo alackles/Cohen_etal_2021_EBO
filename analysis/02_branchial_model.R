@@ -13,7 +13,6 @@ library(lme4)
 library(lmerTest)
 library(dplyr)
 library(tidyr)
-library(AICcmodavg)
 
 # files
 proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
