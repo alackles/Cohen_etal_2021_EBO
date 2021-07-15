@@ -9,6 +9,7 @@
 # required packages
 library(ggplot2)
 library(viridis)
+library(svglite)
 
 
 # files
@@ -56,26 +57,20 @@ plot_ebo <- function(model.df, y="length", legend="off") {
   
 }
 
-ggsave("length_blank.pdf", 
-       plot= plot_ebo(model.data),
-       device="pdf", 
-       path = fig.dir, 
-       width=12, height=9, dpi=300)
+# programmatically generate figures
 
-ggsave("length_legend.pdf", 
-       plot= plot_ebo(model.data, legend="on"),
-       device="pdf", 
-       path = fig.dir, 
-       width=12, height=9, dpi=300)
+legend.opts <- c("on", "off")
+y.opts <- c("ratio", "length")
 
-ggsave("ratio_blank.pdf",
-       plot= plot_ebo(model.data, y="ratio"),
-       device="pdf", 
-       path = fig.dir, 
-       width=12, height=9, dpi=300)
-
-ggsave("ratio_legend.pdf",
-       plot= plot_ebo(model.data, y="ratio", legend="on"),
-       device="pdf", 
-       path = fig.dir, 
-       width=12, height=9, dpi=300)
+for (leg in legend.opts) {
+  for (y in y.opts) {
+    filetype <- "svg"
+    figname <- paste(y, "_", "legend_", leg, ".", filetype, sep="")
+    ggsave(figname,
+           plot=plot_ebo(model.data, legend=leg, y=y),
+           device=filetype,
+           path=fig.dir,
+           width=12, height=9, dpi=300
+           )
+  }
+}
