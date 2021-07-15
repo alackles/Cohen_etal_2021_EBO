@@ -18,8 +18,11 @@ df.fname <- paste(data.dir, "branchial_df.Rdata", sep="")
 branchial.data <- read.csv((paste(data.dir, "branchial_data.csv", sep="")))
 
 # Identify factors 
-facs <- c("Species", "Arch.ID", "Arch.Type")
+facs <- c("Species", "Arch.ID", "Arch.Type", "Oss.Status")
 branchial.data[,facs] <- lapply(branchial.data[,facs], factor)
+
+#re-order oss status labels so they are in the correct order
+branchial.data$Oss.Status <- factor(branchial.data$Oss.Status, levels=c("cartilage", "partial", "ossified"))
 
 # Grab the data we actually want: anchoa and brevoortia only
 ab.data <- branchial.data %>% 
