@@ -7,13 +7,14 @@
 # @brief: Creates visualizations based on models and data from analysis
 
 # required packages
+library(dplyr)
 library(ggplot2)
 library(viridis)
 library(svglite)
 
 
 # files
-proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
+proj.dir <- "~/Documents/research/Cohen_etal_2021_EBO/" #path to this repo
 data.dir <- paste(proj.dir, "data/", sep="")
 model.fname <- paste(data.dir, "model_df.Rdata", sep="")
 fig.dir <- paste (proj.dir, "figs/", sep="")
@@ -21,6 +22,30 @@ fig.dir <- paste (proj.dir, "figs/", sep="")
 
 # load the required data
 model.data <- readRDS(model.fname)
+
+# add spelled-out names...
+legend.labels <- list(
+  "Ceratobranchial 1" = "cb1",
+  "Ceratobranchial 2" = "cb2",
+  "Ceratobranchial 3" = "cb3",
+  "Ceratobranchial 4" = "cb4",
+  "Ceratobranchial 5" = "cb5",
+  "Epibranchial 1" = "eb1",
+  "Epibranchial 2" = "eb2",
+  "Epibranchial 3" = "eb3",
+  "Epibranchial 4" = "eb4"
+)
+
+model.data$Arch <- model.data$Arch.ID
+levels(model.data$Arch) <- legend.labels
+
+# find first ossification point
+oss.thresholds <- model.data %>% 
+  group_by(Species, Arch.Type) %>%
+  mutate(xmin=min(SL)) %>%
+  filter(Oss.Status=="ossified") %>%
+  transmute(xmin = xmin-1, xmax = min(SL), ymin=-Inf, ymax=Inf) %>%
+  distinct()
 
 plot_ebo <- function(model.df, y="length", legend="off") {
   
@@ -37,10 +62,12 @@ plot_ebo <- function(model.df, y="length", legend="off") {
   }
   
   # Basic plot features
-  plt <- plt + aes(color=Arch.ID, fill=Arch.ID) + 
-    facet_wrap(~Arch.Type*Species, scales="free") +
-    geom_point(size=4, aes(alpha=Oss.Status, fill=Arch.ID), pch=21) +
-    geom_point(pch=1, size=4, aes(color=Arch.ID)) + 
+  plt <- plt + aes(color=Arch, fill=Arch) + 
+    facet_wrap(Arch.Type ~ Species, scales="free") +
+    geom_point(size=4, aes(fill=Arch), pch=21) +
+    geom_point(pch=1, size=4, aes(color=Arch)) + 
+    geom_rect(data=oss.thresholds, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="grey", alpha=0.3, inherit.aes=FALSE) +
+    geom_vline(data=oss.thresholds, aes(xintercept=xmax), linetype="dotted") +
     scale_fill_viridis(discrete=TRUE) +
     scale_colour_viridis(discrete=TRUE) + 
     theme_minimal(base_size = 12)
@@ -48,9 +75,9 @@ plot_ebo <- function(model.df, y="length", legend="off") {
   # show or hide legend?
   if (legend=="off") {
     plt <- plt + theme(legend.position="none", strip.text.x = element_blank()) +
-      labs(x="",y="")
+      labs(x="\n",y="\n")
   } else {
-    plt <- plt + guides(alpha=guide_legend(override.aes=list(shape=16)))
+    plt <- plt + guides(fill=guide_legend(override.aes=list(shape=16))) 
   }
   
   return(plt)
@@ -70,7 +97,7 @@ for (leg in legend.opts) {
            plot=plot_ebo(model.data, legend=leg, y=y),
            device=filetype,
            path=fig.dir,
-           width=12, height=9, dpi=300
+           width=16, height=10, dpi=300
            )
   }
 }

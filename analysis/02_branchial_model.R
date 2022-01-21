@@ -5,17 +5,18 @@
 # @date: 2021
 #
 # @brief: Builds a model for branchial arches
-# Arch Type is treated as a fixed effect while sub-sets ArchID treated as random
+# Simplified linear model 
 #
 
 # required packages
 library(lme4)
 library(lmerTest)
+library(effectsize)
 library(dplyr)
 library(tidyr)
 
 # files
-proj.dir <- "~/Documents/research/paper-ebo/" #path to this repo
+proj.dir <- "~/Documents/research/Cohen_etal_2021_EBO/" #path to this repo
 data.dir <- paste(proj.dir, "data/", sep="")
 df.fname <- paste(data.dir, "branchial_df.Rdata", sep="")
 model.fname <- paste(data.dir, "model_df.Rdata", sep="")
@@ -26,6 +27,12 @@ ab.data <- readRDS(df.fname)
 
 # Build Models
 model <- lmer(data=ab.data, Arch.Length ~ SL*Species*Arch.Type + (0 + SL | Arch.Type:Arch.ID))
+
+# Get Effect Sizes
+model.effects <- data.frame(anova(model)) %>%
+  mutate(eta2=signif(F_to_eta2(F.value, NumDF, DenDF)$Eta2_partial,2), 
+         eta2_lowCI=signif(F_to_eta2(F.value, NumDF, DenDF)$CI_low,2),
+         eta2_hiCI=signif(F_to_eta2(F.value, NumDF, DenDF)$CI_high,2))
 
 # add model fit to data
 ab.data$fit <- predict(model)
