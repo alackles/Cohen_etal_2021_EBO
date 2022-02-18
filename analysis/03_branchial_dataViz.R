@@ -63,11 +63,11 @@ plot_ebo <- function(model.df, y="length", legend="off") {
   
   # Basic plot features
   plt <- plt + aes(color=Arch, fill=Arch) + 
-    facet_wrap(Arch.Type ~ Species, scales="free") +
-    geom_point(size=4, aes(fill=Arch), pch=21) +
-    geom_point(pch=1, size=4, aes(color=Arch)) + 
+    facet_wrap(Arch.Type ~ Species, scales="free") + 
     geom_rect(data=oss.thresholds, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="grey", alpha=0.3, inherit.aes=FALSE) +
     geom_vline(data=oss.thresholds, aes(xintercept=xmax), linetype="dotted") +
+    geom_point(size=4, aes(fill=Arch), pch=21) +
+    geom_point(pch=1, size=4, aes(color=Arch)) + 
     scale_fill_viridis(discrete=TRUE) +
     scale_colour_viridis(discrete=TRUE) + 
     theme_minimal(base_size = 12)
